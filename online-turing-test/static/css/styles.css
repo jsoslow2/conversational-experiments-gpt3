@@ -48,13 +48,22 @@ filter: invert(100%);
     width: 28vh;
 }
 
-#message_container {
+.message-container {
     height: 70vh;
     background: #fff;
     border-radius: 50px;
     position: relative;
     margin-top: 100px;
     border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+#message-container {
+  height: 70vh;
+  background: #fff;
+  border-radius: 50px;
+  position: relative;
+  margin-top: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 #message_holder {
@@ -174,3 +183,4 @@ filter: invert(100%);
     border-color: #4A3094; 
     box-shadow: 2px 2px #888888;
 }
+

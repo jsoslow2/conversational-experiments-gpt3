@@ -201,20 +201,60 @@ def call_recommendation_api(the_prompt):
 
 openai.api_key = secret_key
 
-conversation_config = [
-    {
-        "Human": [
-            "Hello, who are you?",
-            "So are you the AI?"
-        ],
-        "AI": [
-            "I'm Jack, what do you want?",
-            "I'm as real as you are, baby"
-        ]
-    }
-]
+conversation_config = {
+    "1": [
+            {
+            "Human": [
+                "Hello, who are you?",
+                "So are you the AI?"
+            ],
+            "AI": [
+                "I'm Jack, what do you want?",
+                "I'm as real as you are, baby"
+            ]
+        }
+    ],
+    "2": [
+            {
+            "Human": [
+                "Hello, who are you?",
+                "So are you the AI?"
+            ],
+            "AI": [
+                "I'm Jack, what do you want?",
+                "I'm as real as you are, baby"
+            ]
+        }
+    ],
+    "3": [
+            {
+            "Human": [
+                "Hello, who are you?",
+                "So are you the AI?"
+            ],
+            "AI": [
+                "I'm Jack, what do you want?",
+                "I'm as real as you are, baby"
+            ]
+        }
+    ],
+    "4": [
+            {
+            "Human": [
+                "Hello, who are you?",
+                "So are you the AI?"
+            ],
+            "AI": [
+                "I'm Jack, what do you want?",
+                "I'm as real as you are, baby"
+            ]
+        }
+    ] 
+}
 
-def generate_conversation_prompt(config):
+def generate_conversation_prompt(number, overall):
+    config = overall[number]
+
     end_token = "\n###\n\n"
     response_prompt = ''
 
@@ -268,15 +308,17 @@ def call_conversation_api(the_prompt):
 def call_therapist_responses(msg, namespace):
     print('We have lift off')
 
+    number = msg['number']
+    print(number)
     input_text = msg['the_text']
     response_tokens = 400
 
 
     #Add Human text to conversation config
-    conversation_config[-1]['Human'].append(input_text)
+    conversation_config[number][-1]['Human'].append(input_text)
 
     #generate prompt
-    generated_prompt = generate_conversation_prompt(conversation_config)
+    generated_prompt = generate_conversation_prompt(number, conversation_config)
     print(generated_prompt)
 
     #Check to see if the token is too large
@@ -284,7 +326,7 @@ def call_therapist_responses(msg, namespace):
     print(len(conversation_tokens) + response_tokens)
     if len(conversation_tokens) + response_tokens > 2048:
         conversation_config.pop(0)
-        generated_prompt = generate_conversation_prompt(conversation_config)
+        generated_prompt = generate_conversation_prompt(number, conversation_config)
 
     #Call Response API
     response_response = call_conversation_api(generated_prompt)
@@ -294,13 +336,16 @@ def call_therapist_responses(msg, namespace):
     print(clean_response_response)
 
     #Add AI Response to the conversation config
-    conversation_config[-1]['AI'].append(clean_response_response)
+    conversation_config[number][-1]['AI'].append(clean_response_response)
 
     #Add relevant text to the recommendations config
     recommendation_config[-1]['Human'].append(input_text)
     recommendation_config[-1]['AI'].append(clean_response_response)
 
-    socketio.emit('to_socket_string', {'string': clean_response_response}, namespace='/test')
+    socketio.emit('to_socket_string', {
+        'string': clean_response_response,
+        'number': number
+        }, namespace='/test')
     return(clean_response_response)
 
 
@@ -321,6 +366,10 @@ def get_recommendations(msg):
 
     socketio.emit('recommendation_socket', {'recommendations_array': array_recommendations}, namespace='/test')
 
+
+@app.route('/test')
+def load_test():
+    return render_template('test.html')
 
 @app.route('/chat')
 def load_chat():
