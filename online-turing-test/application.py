@@ -262,6 +262,8 @@ def call_conversation_api(the_prompt):
     stop = ["\n"])
     return(response)
 
+
+## On chat message, Socket sends out a string named 'python', socketIO listens for this then starts this code.
 @socketio.on('python', namespace='/test')
 def call_therapist_responses(msg, namespace):
     print('We have lift off')
@@ -301,6 +303,8 @@ def call_therapist_responses(msg, namespace):
     socketio.emit('to_socket_string', {'string': clean_response_response}, namespace='/test')
     return(clean_response_response)
 
+
+##listens for 'recommendation_python' string from socket JS
 @socketio.on('recommendation_python', namespace='/test')
 def get_recommendations(msg):
     print(secret_key)

@@ -1,75 +1,78 @@
+//connect to domain
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-       
-  $('#sendbutton').on('click', function(){
-    console.log('Button Clicked');
-    console.log($('#myMessage').val());
 
-            var div_outer = document.createElement("div");
-            div_outer.className = "from-me";
 
-            var msgBody = document.createElement("p");
-            msgBody.innerHTML = $('#myMessage').val();
+//turn your message into a chat message on screen
+$('#sendbutton').on('click', function(){
+  console.log('Button Clicked');
+  console.log($('#myMessage').val());
 
-            var div_end = document.createElement("div");
-            div_end.className = "clear";
 
-            div_outer.appendChild(msgBody);
-            
+  //create outer div
+  var div_outer = document.createElement("div");
+  div_outer.className = "from-me";
 
-            var element = document.getElementById("message_holder");
-            element.appendChild(div_outer);
-            element.appendChild(div_end);
+  //create inner element
+  var msgBody = document.createElement("p");
+  msgBody.innerHTML = $('#myMessage').val();
 
-              element.scrollTop = element.scrollHeight;
+  //ending clear div
+  var div_end = document.createElement("div");
+  div_end.className = "clear";
 
-              //Emit a message to the server so that Python can pick up the 'python' message
-              socket.emit('python', {'the_text': $('#myMessage').val()}, namespace='/test');
+  //append text to outer div
+  div_outer.appendChild(msgBody);
+  
 
-              document.getElementById('myMessage').value = ''
-            }
-            );
+  //get the internal message holder
+  var element = document.getElementById("message_holder");
+  //append the div outer + paragraph
+  element.appendChild(div_outer);
+  //apend the ending clear
+  element.appendChild(div_end);
 
-  var input = document.getElementById("myMessage");
-  input.addEventListener("keyup", function(event) {
+  //scroll to top
+  element.scrollTop = element.scrollHeight;
+
+  //Emit a message to the server so that Python can pick up the 'python' message
+  socket.emit('python', {'the_text': $('#myMessage').val()}, namespace='/test');
+
+  document.getElementById('myMessage').value = ''
+});
+
+
+
+//click sendbutton on 'enter' press
+var input = document.getElementById("myMessage");
+input.addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
       event.preventDefault();
       document.getElementById("sendbutton").click();
     }
-  });
-
-
-
-  socket.on('to_socket_string', function(msg) {
-    var div_outer = document.createElement("div");
-            div_outer.className = "from-them";
-
-            var msgBody = document.createElement("p");
-            msgBody.innerHTML = msg.string;
-
-            var div_end = document.createElement("div");
-            div_end.className = "clear";
-
-            div_outer.appendChild(msgBody);
-            div_outer.appendChild(div_end);
-
-var element = document.getElementById("message_holder");
-element.appendChild(div_outer);
-element.appendChild(div_end); 
-element.scrollTop = element.scrollHeight;
 });
-  socket.on('recommendation_socket', function(msg) {
-////Add response image to your message on the right
-recommendations_array = msg.recommendations_array
-
-for (let l = 0; l < recommendations_array.length; l++) {
-// Runs 5 times, with values of step 0 through 4.
-var recommendation_body = document.createElement("p");
-recommendation_body.style="color: DARKGREEN; text-align:RIGHT; overflow-wrap: break-word; word-wrap: break-word; padding-left:30%; padding-right: 3%;";
-recommendation_body.innerHTML = recommendations_array[l]
-
-document.getElementById('recommendation_holder').appendChild(recommendation_body)
-
-}
 
 
+//update the therapists response when it comes
+socket.on('to_socket_string', function(msg) {
+  //create outer div
+  var div_outer = document.createElement("div");
+  div_outer.className = "from-them";
+
+  //insert inner element
+  var msgBody = document.createElement("p");
+  msgBody.innerHTML = msg.string;
+
+  //ending clear div
+  var div_end = document.createElement("div");
+  div_end.className = "clear";
+
+  //append both
+  div_outer.appendChild(msgBody);
+  div_outer.appendChild(div_end);
+
+  //append outer div and clear end div to message holder
+  var element = document.getElementById("message_holder");
+  element.appendChild(div_outer);
+  element.appendChild(div_end); 
+  element.scrollTop = element.scrollHeight;
 });
